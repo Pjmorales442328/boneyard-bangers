@@ -13,10 +13,12 @@ function stepOffset(step, beat, swing) {
  * perform(ids, song, opts) -> { end, loopStarts, stop }
  * opts.loops: tempo multiplier per loop, e.g. [1, 1.15]; opts.bars: play only the first N bars of each loop;
  * opts.fadeLast: fade out over the last loop; opts.onHit(partId, note): called when a note sounds;
- * opts.button: finish with one last hit together.
+ * opts.button: finish with one last hit together; opts.level: volume of the whole mix (1 = full).
  */
-export function perform(ids, song, { loops = [1], bars = STEPS / STEPS_PER_BAR, fadeLast = false, button = false, onHit = () => {} } = {}) {
+export function perform(ids, song, { loops = [1], bars = STEPS / STEPS_PER_BAR, fadeLast = false, button = false, level = 1, onHit = () => {} } = {}) {
   const bus = createBus();
+  bus.dryBus.gain.value = level;
+  bus.wetBus.gain.value = level;
   const steps = bars * STEPS_PER_BAR;
   const events = [];
   const loopStarts = [];

@@ -4,6 +4,9 @@ import { INSTRUMENTS, SAMPLE_FILES, SFX_LEVELS } from '../../config/instruments.
 let ctx;
 let dry;
 let wet;
+let master;
+let muted = false;
+const MASTER_LEVEL = 0.74;
 const buffers = {};
 
 // A short burst of fading noise makes a believable room; no reverb file needed.
@@ -23,15 +26,17 @@ async function loadSample(name, folder = 'samples') {
   buffers[`${folder}/${name}`] = await ctx.decodeAudioData(await res.arrayBuffer());
 }
 
-// Must be called from a tap: browsers block audio until the player interacts.
+// Loads everything up front. Browsers keep audio paused until the player touches the page, so the first touch anywhere starts it.
 export async function initAudio() {
   if (ctx) return ctx;
   ctx = new AudioContext();
+  addEventListener('pointerdown', () => { if (ctx.state !== 'running') ctx.resume(); }, true);
   const limiter = new DynamicsCompressorNode(ctx, { threshold: -12, ratio: 6, attack: 0.003, release: 0.2 });
   // Rumble below what small speakers can play only eats headroom, and low notes in the reverb turn to mud.
   const rumbleCut = new BiquadFilterNode(ctx, { type: 'highpass', frequency: 38 });
   // The compressor adds its own make-up gain, so trim after it to keep peaks under the ceiling.
-  rumbleCut.connect(limiter).connect(new GainNode(ctx, { gain: 0.74 })).connect(ctx.destination);
+  master = new GainNode(ctx, { gain: muted ? 0 : MASTER_LEVEL });
+  rumbleCut.connect(limiter).connect(master).connect(ctx.destination);
   dry = new GainNode(ctx, { gain: 0.8 });
   wet = new BiquadFilterNode(ctx, { type: 'highpass', frequency: 260 });
   const room = new ConvolverNode(ctx, { buffer: roomImpulse() });
@@ -39,11 +44,16 @@ export async function initAudio() {
   dry.connect(rumbleCut);
   wet.connect(room).connect(wetLevel).connect(rumbleCut);
   await Promise.all([...SAMPLE_FILES.map((name) => loadSample(name)), ...Object.keys(SFX_LEVELS).map((name) => loadSample(name, 'sfx'))]);
-  await ctx.resume();
   return ctx;
 }
 
 export const now = () => ctx.currentTime;
+// Works before the audio has loaded too: the choice is applied when it does.
+export function setMuted(value) {
+  muted = value;
+  if (master) master.gain.value = muted ? 0 : MASTER_LEVEL;
+}
+export const isSounding = () => ctx?.state === 'running';
 
 // A bus is one performance's volume knob, so a whole mix can be faded or cut at once.
 export function createBus() {

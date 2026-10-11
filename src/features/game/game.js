@@ -10,6 +10,7 @@ import { createStage } from '../stage/stage.js';
 import { wins, starsFor, hintFor, MAX_STARS } from '../tour/solutions.js';
 import { createPicker } from './picker.js';
 import { createFinale } from './finale.js';
+import { createCoach } from './coach.js';
 import { record, bestStars, starRow } from './progress.js';
 
 // How the second pass of the song changes for a verdict: the riot speeds up, the lullaby winds down.
@@ -35,10 +36,11 @@ export function createGame({ gig, onExit, onNext }) {
   const picker = createPicker({ gig, onToggle: toggle, onMash: mash });
   const finale = createFinale({ gig, onAgain: reset, onExit: leave, onNext: onNext && (() => { stopPlaying(); onNext(); }) });
   stage.node.append(finale.title);
+  const coach = gig.coach ? createCoach(gig) : null;
   const best = el('span', { class: 'best-stars', title: 'Your best at this gig' });
   const node = el('main', { class: 'game' },
     el('header', {}, el('button', { class: 'back', type: 'button', 'aria-label': 'Back to the tour', onclick: leave }, '‹'), el('h1', {}, gig.name), best),
-    el('p', { class: 'ask' }, `${gig.hat} “${gig.ask}”`, el('small', {}, `♪ ${song.title}`)),
+    coach?.node ?? el('p', { class: 'ask' }, `${gig.hat} “${gig.ask}”`, el('small', {}, `♪ ${song.title}`)),
     stage.node,
     el('div', { class: 'panel' }, picker.node, finale.foot),
   );
@@ -48,7 +50,7 @@ export function createGame({ gig, onExit, onNext }) {
 
   function refresh() {
     stage.setBand(picks);
-    picker.update(picks);
+    picker.update(picks, coach?.update(picks, 'pick'));
   }
 
   function toggle(id) {
@@ -77,6 +79,7 @@ export function createGame({ gig, onExit, onNext }) {
     const encore = (won && ENCORE[verdict]) || { tempo: 1 };
     node.classList.add('performing');
     finale.wait();
+    coach?.update(picks, 'playing');
     stage.say([]);
     stage.setMood('listen', beat);
     // A win plays on into an encore under the celebration; a miss stops after one pass so the next try comes quickly.
@@ -96,6 +99,7 @@ export function createGame({ gig, onExit, onNext }) {
     at(heard + REVEAL_GAP, () => {
       if (!won) stage.setMood('boo', beat);
       finale.show({ verdict, stars });
+      coach?.update(picks, won ? 'won' : 'lost');
     });
     if (won && !['legend', 'sleep'].includes(verdict)) at(run.end, () => stage.setMood('cheer', beat, true, perfect));
   }

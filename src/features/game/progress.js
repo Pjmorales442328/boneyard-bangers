@@ -10,11 +10,17 @@ export async function loadProgress() { best = await load(KEY, {}); }
 
 export const bestStars = (gigId) => Number(best[gigId] ?? 0);
 export const totalStars = () => GIGS.reduce((sum, g) => sum + bestStars(g.id), 0);
+export const clearedCount = () => GIGS.filter((g) => bestStars(g.id) > 0).length;
 export const starRow = (n) => '★'.repeat(n) + '☆'.repeat(MAX_STARS - n);
 // A gig opens once the one before it has been cleared.
 // ponytail: adding ?unlock to the address opens every gig, for testing and demos; remove it if a leaderboard ever depends on progress.
 const unlockAll = new URLSearchParams(location.search).has('unlock');
 export const isOpen = (index) => unlockAll || index === 0 || bestStars(GIGS[index - 1].id) > 0;
+
+export function resetProgress() {
+  best = {};
+  save(KEY, best);
+}
 
 export function record(gigId, earned) {
   if (earned <= bestStars(gigId)) return;

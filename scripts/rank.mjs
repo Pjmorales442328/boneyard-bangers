@@ -5,7 +5,7 @@ import { SONGS, PART_IDS } from '../src/features/music/songs/index.js';
 import { SLOTS } from '../src/config/song.js';
 import { scoreMix } from '../src/features/music/score.js';
 import { combos } from '../src/lib/combos.js';
-import { GIGS } from '../src/config/gigs.js';
+import { GIGS, TUTORIAL } from '../src/config/gigs.js';
 import { wins, solutions, hintFor, starsFor, MAX_STARS } from '../src/features/tour/solutions.js';
 
 const rank = (song) => combos(PART_IDS, SLOTS).map((ids) => ({ ids, ...scoreMix(ids, song) })).sort((a, b) => b.score - a.score);
@@ -22,7 +22,7 @@ function checkSongs() {
 
 // Every gig must be winnable, its best band must earn full stars, and following the swap hints from any losing band must reach a win.
 function checkGigs() {
-  for (const gig of GIGS) {
+  for (const gig of [...GIGS, TUTORIAL]) {
     assert.ok(SONGS[gig.song], `gig "${gig.id}" names an unknown song`);
     const song = SONGS[gig.song];
     assert.ok(solutions(gig).length >= 1, `gig "${gig.id}" has no winning band`);

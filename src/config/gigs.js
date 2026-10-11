@@ -6,6 +6,9 @@ const FIRST = ['drums', 'bass', 'organ', 'tune', 'shaker'];
 const without = (...ids) => ALL.filter((id) => !ids.includes(id));
 const GROOVE = ['dance', 'legend'];
 
+// The warm-up before the tour: a monster coaches the player to the best band (src/features/game/coach.js). Not part of the tour.
+export const TUTORIAL = { id: 'soundcheck', name: 'Soundcheck', hat: '🎩', prop: '🎈', hue: 0, song: 'twinkle', wants: GROOVE, roster: ALL, coach: true, ask: 'Warm up before the tour.' };
+
 // ponytail: costumes are emoji (hat + prop), so they look a little different per device; draw them as SVG if that ever matters.
 export const GIGS = [
   { id: 'party', name: 'Graveyard Party', hat: '🎩', prop: '🎈', hue: 0, song: 'korobeiniki', wants: GROOVE, roster: FIRST, ask: 'Make us dance! We need a beat, a bass and a tune.' },

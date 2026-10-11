@@ -16,8 +16,12 @@ export function createPicker({ gig, onToggle, onMash }) {
   const mash = el('button', { class: 'mash', type: 'button', onclick: onMash }, 'MASH!');
   const node = el('div', { class: 'picker' }, el('div', { class: 'cards' }, Object.values(cards)), mash);
 
-  function update(picks) {
-    for (const [id, card] of Object.entries(cards)) card.classList.toggle('picked', picks.includes(id));
+  // `tapId` is the card the tutorial wants tapped next, if any.
+  function update(picks, tapId = null) {
+    for (const [id, card] of Object.entries(cards)) {
+      card.classList.toggle('picked', picks.includes(id));
+      card.classList.toggle('tap-me', id === tapId);
+    }
     const left = SLOTS - picks.length;
     mash.disabled = left > 0;
     mash.textContent = left > 0 ? `Pick ${left} more` : 'MASH!';
