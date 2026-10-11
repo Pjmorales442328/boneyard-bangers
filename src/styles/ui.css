@@ -3,7 +3,6 @@
 .game header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px; }
 .game h1 { flex: 1; min-width: 0; font-size: clamp(13px, 4.3vw, 20px); color: var(--accent); text-shadow: 0 2px 0 #b3472c; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .back { width: 34px; aspect-ratio: 1; border-radius: 50%; background: var(--card); font-size: 22px; font-weight: 900; line-height: 1; }
-.at-stake { color: var(--accent); font-size: 18px; letter-spacing: 2px; }
 .ask { padding: 0 6px; font-size: 14px; line-height: 1.25; color: var(--text); }
 .ask small { display: block; font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -27,17 +26,17 @@
 
 @media (max-height: 700px) { .card { --s: 0.075; } .card small { display: none; } .mash { padding: 10px; font-size: 19px; } }
 
-/* MASH starts a cutscene: the picker folds away and the stage takes the whole screen. */
-.performing .panel { max-height: 0; padding-bottom: 0; opacity: 0; pointer-events: none; }
-.finale { position: absolute; inset: 5% 4% auto; z-index: 6; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; animation: title-in 0.45s cubic-bezier(.3,1.6,.5,1); }
+/* MASH starts a cutscene: the monster cards fold away, the stage takes their room, and one row stays where MASH was for what comes next. */
+.finale-foot { display: none; height: 51px; align-items: center; justify-content: center; gap: 8px; }
+.performing .picker { display: none; }
+.performing .finale-foot { display: flex; }
+.performing .panel { max-height: 58px; }
+.finale-foot .again { flex: 1; max-width: 240px; padding: 12px 14px; font-size: 18px; animation: title-in 0.4s cubic-bezier(.3,1.6,.5,1); }
+.listening { color: var(--muted); font-size: 14px; font-weight: 800; animation: twinkle 1.6s infinite; }
+/* The title sits just above the band's heads, wherever the stage puts the band. */
+.finale { position: absolute; left: 4%; right: 4%; bottom: min(100% - 76px, var(--band-bottom) + 50cqw + 4px); z-index: 6; display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; pointer-events: none; animation: title-in 0.45s cubic-bezier(.3,1.6,.5,1); }
 @keyframes title-in { from { translate: 0 -30px; scale: 0.6; opacity: 0; } }
-.finale h2 { font-size: clamp(22px, 7.5vw, 36px); line-height: 1.1; color: var(--accent); text-shadow: 0 3px 0 #b3472c, 0 0 18px #000c; }
-.finale-note { max-width: 300px; font-size: 13px; font-weight: 800; text-shadow: 0 1px 5px #000, 0 0 12px #000; }
-.earned { font-size: 46px; line-height: 1; letter-spacing: 6px; color: #564a86; text-shadow: 0 0 12px #0008; }
-.earned span { display: inline-block; }
-.earned .on { color: var(--accent); text-shadow: 0 3px 0 #b98a12; animation: star-pop 0.5s cubic-bezier(.3,2,.5,1) backwards; animation-delay: calc(0.25s + var(--i) * 0.3s); }
-@keyframes star-pop { from { scale: 0; rotate: -90deg; } }
-.finale-foot { display: flex; gap: 8px; margin-top: 8px; animation: fade-in 0.4s 1.3s backwards; }
-@keyframes fade-in { from { opacity: 0; } }
-.again.quiet { background: var(--card); color: var(--text); box-shadow: 0 4px 0 #1d1447; }
-.again { padding: 10px 14px; border-radius: 12px; background: var(--accent); color: #3a1d00; font-weight: 800; box-shadow: 0 4px 0 #b98a12; white-space: nowrap; }
+.finale h2 { font-size: clamp(24px, 8vw, 40px); line-height: 1.1; color: var(--accent); text-shadow: 0 3px 0 #b3472c, 0 0 18px #000c; }
+.finale-note { font-size: 15px; font-weight: 800; text-shadow: 0 1px 5px #000, 0 0 12px #000; }
+.again.quiet { flex: 0 1 auto; background: var(--card); color: var(--text); box-shadow: 0 4px 0 #1d1447; }
+.again { border-radius: 12px; background: var(--accent); color: #3a1d00; font-weight: 800; box-shadow: 0 4px 0 #b98a12; white-space: nowrap; }

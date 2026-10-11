@@ -1,28 +1,30 @@
-// The end of the cutscene: a title over the stage with the stars or what the crowd heard, and what to do next.
+// The end of the cutscene: a title over the band saying how it went, and the next-step buttons where MASH was.
 import { el } from '../../lib/dom.js';
 import { VERDICTS } from '../../config/verdicts.js';
-import { MAX_STARS, starsForTry } from './progress.js';
 
-export function createFinale({ gig, onAgain, onExit }) {
-  const node = el('div', { class: 'finale', hidden: '' });
+export function createFinale({ gig, onAgain, onExit, onNext }) {
+  const title = el('div', { class: 'finale', hidden: '' });
+  const foot = el('div', { class: 'finale-foot' });
   const wanted = VERDICTS[gig.wants[0]].title;
   const button = (text, onclick, quiet) => el('button', { class: quiet ? 'again quiet' : 'again', type: 'button', onclick }, text);
 
-  function show({ won, verdict, tries }) {
-    const v = VERDICTS[verdict];
-    const stars = starsForTry(tries);
-    node.replaceChildren(...[
-      el('h2', {}, won ? 'Gig cleared!' : `${v.icon} ${v.title}`),
-      won ? el('p', { class: 'earned' }, Array.from({ length: MAX_STARS }, (_, i) => el('span', { class: i < stars ? 'on' : '', style: `--i:${i}` }, '★'))) : null,
-      // Stars count tries, not how good the music was, so say so next to them.
-      el('p', { class: 'finale-note' }, !won ? `They wanted: ${wanted}` : tries === 1 ? 'First try!' : `Cleared on try ${tries}. A first-try clear earns ${MAX_STARS} stars.`),
-      el('div', { class: 'finale-foot' },
-        won && stars < MAX_STARS ? button('Replay', onAgain, true) : null,
-        won ? button('Back to the tour', onExit) : button('Try again', onAgain),
-      ),
-    ].filter(Boolean));
-    node.hidden = false;
+  // While the band plays, the button row says what is going on.
+  function wait() {
+    title.hidden = true;
+    foot.replaceChildren(el('p', { class: 'listening' }, 'The crowd is listening...'));
   }
 
-  return { node, show, hide: () => { node.hidden = true; } };
+  function show({ won, verdict }) {
+    const v = VERDICTS[verdict];
+    title.replaceChildren(
+      el('h2', {}, won ? `${gig.hat} Gig cleared!` : `${v.icon} ${v.title}`),
+      el('p', { class: 'finale-note' }, won ? `${v.icon} ${v.title}` : `They wanted: ${wanted}`),
+    );
+    title.hidden = false;
+    foot.replaceChildren(...(won
+      ? [button('Tour', onExit, true), onNext ? button('Next gig ›', onNext) : null]
+      : [button('Try again', onAgain)]).filter(Boolean));
+  }
+
+  return { title, foot, wait, show };
 }

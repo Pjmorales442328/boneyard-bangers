@@ -10,20 +10,19 @@ import { createStage } from '../stage/stage.js';
 import { wins } from '../tour/solutions.js';
 import { createPicker } from './picker.js';
 import { createFinale } from './finale.js';
-import { record, starsForTry, MAX_STARS } from './progress.js';
+import { record } from './progress.js';
 
 // How the second pass of the song changes for a verdict: the riot speeds up, the lullaby winds down.
 const ENCORE = { legend: { tempo: 1.18 }, dance: { tempo: 1.06 }, sleep: { tempo: 0.78, fade: true } };
 // Seconds the crowd acts out what it heard before the title comes up.
 const REVEAL_GAP = 1.4;
 
-export function createGame({ gig, onExit }) {
+export function createGame({ gig, onExit, onNext }) {
   const song = SONGS[gig.song];
   const beat = 60 / song.bpm;
   let picks = [];
   let playing = null;
   let busy = false;
-  let tries = 0;
   let cleared = false;
 
   let hushCrowd = () => {};
@@ -31,14 +30,13 @@ export function createGame({ gig, onExit }) {
   const leave = () => { stopPlaying(); onExit(); };
   const stage = createStage({ gig, onRemove: (id) => toggle(id) });
   const picker = createPicker({ gig, onToggle: toggle, onMash: mash });
-  const finale = createFinale({ gig, onAgain: reset, onExit: leave });
-  stage.node.append(finale.node);
-  const atStake = el('span', { class: 'at-stake', title: 'Stars you win if you clear the gig now' });
+  const finale = createFinale({ gig, onAgain: reset, onExit: leave, onNext: onNext && (() => { stopPlaying(); onNext(); }) });
+  stage.node.append(finale.title);
   const node = el('main', { class: 'game' },
-    el('header', {}, el('button', { class: 'back', type: 'button', 'aria-label': 'Back to the tour', onclick: leave }, '‹'), el('h1', {}, gig.name), atStake),
+    el('header', {}, el('button', { class: 'back', type: 'button', 'aria-label': 'Back to the tour', onclick: leave }, '‹'), el('h1', {}, gig.name)),
     el('p', { class: 'ask' }, `${gig.hat} “${gig.ask}”`, el('small', {}, `♪ ${song.title}`)),
     stage.node,
-    el('div', { class: 'panel' }, picker.node),
+    el('div', { class: 'panel' }, picker.node, finale.foot),
   );
 
   const after = (audioTime, fn) => setTimeout(fn, Math.max(0, (audioTime - now()) * 1000));
@@ -46,8 +44,6 @@ export function createGame({ gig, onExit }) {
   function refresh() {
     stage.setBand(picks);
     picker.update(picks);
-    const stars = starsForTry(tries + 1);
-    atStake.textContent = '★'.repeat(stars) + '☆'.repeat(MAX_STARS - stars);
   }
 
   function toggle(id) {
@@ -65,13 +61,13 @@ export function createGame({ gig, onExit }) {
   function mash() {
     if (busy || picks.length < SLOTS) return;
     busy = true;
-    tries += 1;
     stopPlaying();
     const { verdict } = scoreMix(picks, song);
     const won = wins(gig, verdict);
     cleared = won;
     const encore = (won && ENCORE[verdict]) || { tempo: 1 };
     node.classList.add('performing');
+    finale.wait();
     stage.say([]);
     stage.setMood('listen', beat);
     // A win plays on into an encore under the celebration; a miss stops after one pass so the next try comes quickly.
@@ -86,11 +82,11 @@ export function createGame({ gig, onExit }) {
       hushCrowd = playCrowd(verdict);
       // After a miss the crowd's wish stays up while the player changes the band.
       stage.say([VERDICTS[verdict].say, won ? 'Just what we wanted!' : VERDICTS[gig.wants[0]].nudge], !won);
-      if (won) record(gig.id, starsForTry(tries));
+      if (won) record(gig.id);
     });
     at(heard + REVEAL_GAP, () => {
       if (!won) stage.setMood('boo', beat);
-      finale.show({ won, verdict, tries });
+      finale.show({ won, verdict });
     });
     if (won && !['legend', 'sleep'].includes(verdict)) at(run.end, () => stage.setMood('cheer', beat, true));
   }
@@ -100,9 +96,9 @@ export function createGame({ gig, onExit }) {
     stopPlaying();
     busy = false;
     node.classList.remove('performing');
-    finale.hide();
+    finale.title.hidden = true;
     stage.setMood('idle', beat);
-    if (cleared) { picks = []; tries = 0; cleared = false; stage.say([]); }
+    if (cleared) { picks = []; cleared = false; stage.say([]); }
     refresh();
   }
 

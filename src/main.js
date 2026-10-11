@@ -9,6 +9,7 @@ import { el } from './lib/dom.js';
 import { initAudio } from './features/audio/engine.js';
 import { createGame } from './features/game/game.js';
 import { createTour } from './features/tour/tourScreen.js';
+import { GIGS } from './config/gigs.js';
 
 const app = document.getElementById('app');
 const status = el('p', { class: 'start-status' }, 'Take the monster band on tour. Every crowd wants a different sound.');
@@ -17,7 +18,10 @@ const start = el('div', { class: 'start' }, el('h1', {}, 'Boneyard Bangers'), st
 app.append(start);
 
 const showTour = () => app.replaceChildren(createTour({ onPlay: showGig }).node);
-const showGig = (gig) => app.replaceChildren(createGame({ gig, onExit: showTour }).node);
+function showGig(gig) {
+  const next = GIGS[GIGS.indexOf(gig) + 1];
+  app.replaceChildren(createGame({ gig, onExit: showTour, onNext: next && (() => showGig(next)) }).node);
+}
 
 startBtn.addEventListener('click', async () => {
   startBtn.disabled = true;

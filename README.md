@@ -2,7 +2,7 @@
 
 A monster band game for the RUN.world October Jam (theme: Monster Mash).
 
-The monster band goes on a tour of 12 gigs, each with its own track. Each gig has a ghost crowd in costume that wants one style of music: a lullaby for the nursery, a grave rumble for the demolition crew, a perfect banger for the final. Pick four monsters, hit **MASH**, and the crowd reacts. The gig then plays out as a cutscene on the full stage: the ghosts cheer and stars drop in, or they boo, throw tomatoes and shout what they wanted instead. Stars count tries: a first-try clear earns 3. New monsters join as the tour goes on.
+The monster band goes on a tour of 12 gigs, each with its own track. Each gig has a ghost crowd in costume that wants one style of music: a lullaby for the nursery, a grave rumble for the demolition crew, a perfect banger for the final. Pick four monsters, hit **MASH**, and the crowd reacts. The gig then plays out as a cutscene on the stage: the ghosts cheer and the gig is ticked off, or they boo, throw tomatoes and shout what they wanted instead. New monsters join as the tour goes on.
 
 The verdict is not hand-written per mix. The game measures the notes each monster plays and scores the mix on four things, calibrated per track:
 
@@ -32,7 +32,7 @@ src/
   features/music/songs/  the 12 tracks as note data
   features/audio/    Web Audio engine and performance scheduler
   features/stage/    monsters, instruments, ghost crowd, scenery
-  features/game/     picker, result card, one gig's flow, star progress
+  features/game/     picker, cutscene ending, one gig's flow, cleared-gig progress
   features/tour/     tour map screen and win check
   lib/               small DOM and storage helpers
   styles/            CSS, one file per area
