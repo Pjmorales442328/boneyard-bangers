@@ -1,8 +1,13 @@
-// Saves small JSON values in the browser. Storage can be blocked (private mode, embedded frames), so never throw.
-// ponytail: localStorage only; switch to the RUN SDK's cloud storage once the game is wired to RUN accounts.
-export function load(key, fallback) {
+// Saves small JSON values to the player's RUN.world account (browser storage is blocked inside RUN's game frame).
+// Storage must never break the game: a failed read gives the fallback and a failed save is only logged.
+import RundotGameAPI from '@series-inc/rundot-game-sdk/api';
+
+const ready = RundotGameAPI.initializeAsync();
+
+export async function load(key, fallback) {
   try {
-    return JSON.parse(localStorage.getItem(key)) ?? fallback;
+    await ready;
+    return JSON.parse(await RundotGameAPI.appStorage.getItem(key)) ?? fallback;
   } catch (err) {
     console.warn(`could not read "${key}" from storage`, err);
     return fallback;
@@ -10,9 +15,5 @@ export function load(key, fallback) {
 }
 
 export function save(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (err) {
-    console.warn(`could not save "${key}" to storage`, err);
-  }
+  ready.then(() => RundotGameAPI.appStorage.setItem(key, JSON.stringify(value))).catch((err) => console.warn(`could not save "${key}" to storage`, err));
 }

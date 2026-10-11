@@ -1,0 +1,15 @@
+{
+  "gameId": "1Hd01w1VZQCQLoDomul7",
+  "relativePathToDistFolder": "dist",
+  "usesPreloader": false,
+  "fullscreenEnabled": true,
+  "maxDpr": 1.5,
+  "orientation": "portrait",
+  "keywords": [
+    "music",
+    "monsters",
+    "halloween",
+    "puzzle"
+  ],
+  "kitId": null
+}

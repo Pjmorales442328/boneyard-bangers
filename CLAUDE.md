@@ -23,5 +23,6 @@ Monster band game for the RUN.world October Jam. Vanilla JS + Vite, no framework
 - Crowd sounds are in `public/sfx/<verdict>.mp3`, levels in `SFX_LEVELS` (`src/config/instruments.js`), played by `playCrowd` in `engine.js`. `?unlock` in the address opens every gig.
 - Sample pitches in `src/config/instruments.js` are the measured pitch, one octave above the VCSL file name.
 - Changing notes or scoring can make a gig unwinnable; `npm test` fails if so. Fix the gig's `wants` or `roster`.
-- Best stars per gig are saved in localStorage (`src/lib/storage.js`, key `graveyard-gigs-tour`, falling back to the old `boneyard-bangers-tour`). RUN SDK storage is not wired yet.
+- Best stars per gig are saved to the player's RUN.world account through the RUN SDK's `appStorage` (`src/lib/storage.js`, key `graveyard-gigs-tour`); `main.js` awaits `loadProgress()` before the title screen. Browser storage is blocked inside RUN's game frame, so never use `localStorage`.
+- RUN.world: game id is in `game.config.prod.json` (keep it). Deploy with `npm run build` then `rundot deploy` (CLI at `%LOCALAPPDATA%\Programs\Rundot\rundot.exe`, not on PATH). `rundot preflight` checks the build. `public/thumbnail.jpg` must be exactly 512×512. SDK docs are in `node_modules/@series-inc/rundot-game-sdk/docs/`.
 - Keep files under about 150 lines, one job per file.

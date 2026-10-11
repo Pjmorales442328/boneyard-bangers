@@ -12,5 +12,8 @@
   },
   "devDependencies": {
     "vite": "^7.0.0"
+  },
+  "dependencies": {
+    "@series-inc/rundot-game-sdk": "^5.29.1"
   }
 }

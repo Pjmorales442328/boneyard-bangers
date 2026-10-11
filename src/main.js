@@ -11,6 +11,7 @@ import { createGame } from './features/game/game.js';
 import { createTour } from './features/tour/tourScreen.js';
 import { createTitle } from './features/title/titleScreen.js';
 import { GIGS } from './config/gigs.js';
+import { loadProgress } from './features/game/progress.js';
 
 const app = document.getElementById('app');
 const showTour = () => app.replaceChildren(createTour({ onPlay: showGig }).node);
@@ -19,4 +20,5 @@ function showGig(gig) {
   app.replaceChildren(createGame({ gig, onExit: showTour, onNext: next && (() => showGig(next)) }).node);
 }
 
+await loadProgress();
 app.append(createTitle({ onStart: async () => { await initAudio(); showTour(); } }).node);

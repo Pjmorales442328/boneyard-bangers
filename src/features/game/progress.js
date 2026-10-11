@@ -4,8 +4,9 @@ import { GIGS } from '../../config/gigs.js';
 import { MAX_STARS } from '../tour/solutions.js';
 
 const KEY = 'graveyard-gigs-tour';
-// ponytail: falls back to the key from the game's first name so early saves carry over; drop it after the jam.
-const best = load(KEY, null) ?? load('boneyard-bangers-tour', {});
+let best = {};
+// Call once before showing any screen that reads stars.
+export async function loadProgress() { best = await load(KEY, {}); }
 
 export const bestStars = (gigId) => Number(best[gigId] ?? 0);
 export const totalStars = () => GIGS.reduce((sum, g) => sum + bestStars(g.id), 0);
