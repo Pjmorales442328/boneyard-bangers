@@ -1,6 +1,6 @@
-// Measures a mix (a list of part ids) and returns raw numbers. No opinions here; score.js turns them into a verdict.
+// Measures a mix (a list of part ids from one song's parts) and returns raw numbers. No opinions here; score.js turns them into a verdict.
 import { STEPS, STEPS_PER_BAR, BARS } from '../../config/song.js';
-import { PARTS, isPitched } from './parts.js';
+import { isPitched } from './notation.js';
 import { roughness } from './roughness.js';
 
 // Metric weight of each sixteenth in a 4/4 bar (Longuet-Higgins & Lee): downbeat strongest.
@@ -25,8 +25,8 @@ function syncopation(notes) {
 // Drums are several voices (kick, snare, hat) and each is counted alone; a pitched part is one voice.
 const voices = (notes) => (isPitched(notes[0]) ? [notes] : [...new Set(notes.map((n) => n.p))].map((p) => notes.filter((n) => n.p === p)));
 
-export function measure(ids) {
-  const parts = ids.map((id) => PARTS[id]);
+export function measure(ids, songParts) {
+  const parts = ids.map((id) => songParts[id]);
   const all = parts.flatMap((notes, part) => notes.map((n) => ({ ...n, part })));
   const pitched = all.filter(isPitched);
 

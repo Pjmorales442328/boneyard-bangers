@@ -12,6 +12,9 @@ export const INSTRUMENTS = {
   glock: { gain: 0.62, reverb: 0.4, pitched: { 91: 'glock_G5', 96: 'glock_C6' } },
 };
 
+// Crowd reaction sounds, one per verdict (public/sfx). Levels sit under the band so the music stays in front.
+export const SFX_LEVELS = { legend: 0.7, dance: 0.6, meh: 0.8, offbeat: 0.7, quake: 0.8, ouch: 0.55, dizzy: 0.7, sleep: 0.7 };
+
 export const SAMPLE_FILES = [
   'kick', 'snare', 'hat', 'shake', 'tamb', 'clap',
   ...Object.values(INSTRUMENTS).flatMap((i) => Object.values(i.pitched ?? {})),

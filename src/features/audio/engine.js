@@ -1,5 +1,5 @@
 // Web Audio engine: loads the samples once and plays single notes on the audio clock.
-import { INSTRUMENTS, SAMPLE_FILES } from '../../config/instruments.js';
+import { INSTRUMENTS, SAMPLE_FILES, SFX_LEVELS } from '../../config/instruments.js';
 
 let ctx;
 let dry;
@@ -17,10 +17,10 @@ function roomImpulse(seconds = 1.6) {
   return buf;
 }
 
-async function loadSample(name) {
-  const res = await fetch(`./samples/${name}.mp3`);
+async function loadSample(name, folder = 'samples') {
+  const res = await fetch(`./${folder}/${name}.mp3`);
   if (!res.ok) throw new Error(`sample ${name} failed to load (${res.status})`);
-  buffers[name] = await ctx.decodeAudioData(await res.arrayBuffer());
+  buffers[`${folder}/${name}`] = await ctx.decodeAudioData(await res.arrayBuffer());
 }
 
 // Must be called from a tap: browsers block audio until the player interacts.
@@ -38,7 +38,7 @@ export async function initAudio() {
   const wetLevel = new GainNode(ctx, { gain: 0.5 });
   dry.connect(rumbleCut);
   wet.connect(room).connect(wetLevel).connect(rumbleCut);
-  await Promise.all(SAMPLE_FILES.map(loadSample));
+  await Promise.all([...SAMPLE_FILES.map((name) => loadSample(name)), ...Object.keys(SFX_LEVELS).map((name) => loadSample(name, 'sfx'))]);
   await ctx.resume();
   return ctx;
 }
@@ -60,9 +60,18 @@ export function createBus() {
 }
 
 function pickSample(inst, note) {
-  if (!inst.pitched) return { buffer: buffers[note.p], rate: 1, level: inst.levels[note.p] ?? 1 };
+  if (!inst.pitched) return { buffer: buffers[`samples/${note.p}`], rate: 1, level: inst.levels[note.p] ?? 1 };
   const base = Object.keys(inst.pitched).map(Number).reduce((a, b) => (Math.abs(b - note.p) < Math.abs(a - note.p) ? b : a));
-  return { buffer: buffers[inst.pitched[base]], rate: 2 ** ((note.p - base) / 12), level: 1 };
+  return { buffer: buffers[`samples/${inst.pitched[base]}`], rate: 2 ** ((note.p - base) / 12), level: 1 };
+}
+
+// Plays the crowd's reaction sound for a verdict. Returns a stop function so leaving the gig cuts it off.
+export function playCrowd(verdict) {
+  const src = new AudioBufferSourceNode(ctx, { buffer: buffers[`sfx/${verdict}`] });
+  const amp = new GainNode(ctx, { gain: SFX_LEVELS[verdict] });
+  src.connect(amp).connect(dry);
+  src.start();
+  return () => amp.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.08);
 }
 
 // Plays one note of a part at audio time `when`; `seconds` is the note's written length.

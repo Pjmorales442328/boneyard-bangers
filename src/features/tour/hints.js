@@ -4,9 +4,10 @@ import { combos } from '../../lib/combos.js';
 import { SLOTS } from '../../config/song.js';
 import { monsterById } from '../../config/monsters.js';
 import { scoreMix } from '../music/score.js';
+import { SONGS } from '../music/songs/index.js';
 
 export const wins = (gig, verdict) => gig.wants.includes(verdict);
-export const solutions = (gig) => combos(gig.roster, SLOTS).map((ids) => ({ ids, ...scoreMix(ids) })).filter((r) => wins(gig, r.verdict));
+export const solutions = (gig) => combos(gig.roster, SLOTS).map((ids) => ({ ids, ...scoreMix(ids, SONGS[gig.song]) })).filter((r) => wins(gig, r.verdict));
 
 // Each miss makes the hint blunter: how many can stay, then who must go, then the exact swap.
 export function hintFor(gig, picks, misses) {

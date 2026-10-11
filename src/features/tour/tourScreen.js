@@ -2,6 +2,7 @@
 import { el } from '../../lib/dom.js';
 import { GIGS } from '../../config/gigs.js';
 import { VERDICTS } from '../../config/verdicts.js';
+import { SONGS } from '../music/songs/index.js';
 import { MAX_STARS, starsFor, totalStars, isOpen } from '../game/progress.js';
 
 const starRow = (n) => '★'.repeat(n) + '☆'.repeat(MAX_STARS - n);
@@ -11,7 +12,7 @@ export function createTour({ onPlay }) {
     const open = isOpen(i);
     return el('button', { class: 'gig', type: 'button', ...(open ? {} : { disabled: '' }), onclick: () => onPlay(gig) },
       el('span', { class: 'gig-hat' }, open ? gig.hat : '🔒'),
-      el('span', { class: 'gig-text' }, el('strong', {}, `${i + 1}. ${gig.name}`), el('small', {}, open ? `Wants: ${VERDICTS[gig.wants[0]].title}` : 'Clear the gig before this one')),
+      el('span', { class: 'gig-text' }, el('strong', {}, `${i + 1}. ${gig.name}`), el('small', {}, open ? `♪ ${SONGS[gig.song].title} · wants ${VERDICTS[gig.wants[0]].title}` : 'Clear the gig before this one')),
       el('span', { class: 'gig-stars' }, starRow(starsFor(gig.id))),
     );
   });

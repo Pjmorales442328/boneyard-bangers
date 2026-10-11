@@ -1,8 +1,6 @@
-// The eight band parts as note data. Tune: "In the Hall of the Mountain King" (Grieg, 1875, public domain), in D minor.
-// A note is { s: step, p: MIDI pitch or drum sample name, d: length in steps, v: loudness 0..1 }.
-import { STEPS_PER_BAR as B } from '../../config/song.js';
+// "In the Hall of the Mountain King" in D minor, with every part written by hand. The other songs are in arranged.js.
+import { B, note } from '../notation.js';
 
-const note = (s, p, d = 2, v = 0.8) => ({ s, p, d, v });
 // Lay out [stepInBar, pitch, dur?, vel?] rows for one bar.
 const bar = (n, rows) => rows.map(([s, p, d, v]) => note(n * B + s, p, d, v));
 const everyBar = (rows) => [0, 1, 2, 3].flatMap((n) => bar(n, rows));
@@ -50,6 +48,7 @@ const boogie = boogieRoots.flatMap((r, h) => [0, 7, 9, 7].map((iv, i) => note(h 
 // Harpsichord runs the chord in sixteenths. Busy on purpose.
 const harpsi = CHORDS.flatMap((c, h) => [0, 1, 2, 3, 4, 5, 6, 7].map((i) => note(h * 8 + i, [c[0], c[1], c[2], c[0] + 12, c[2], c[1], c[0], c[1]][i], 1, i % 4 ? 0.45 : 0.7)));
 
-export const PARTS = { drums, bass, organ, tune, shaker, glock, boogie, harpsi };
-export const PART_IDS = Object.keys(PARTS);
-export const isPitched = (n) => typeof n.p === 'number';
+export const mountainKing = {
+  id: 'mountainKing', title: 'In the Hall of the Mountain King', by: 'Edvard Grieg, 1875', bpm: 104, swing: 0.62,
+  parts: { drums, bass, organ, tune, shaker, glock, boogie, harpsi },
+};
