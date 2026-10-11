@@ -1,0 +1,10 @@
+/* Title screen: the stage as a poster, the logo over the band, one button underneath. */
+.title { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+.title .stage { pointer-events: none; }
+.logo { position: absolute; left: 4%; right: 4%; bottom: min(100% - 150px, var(--band-bottom) + 50cqw + 10px); z-index: 6; display: flex; flex-direction: column; align-items: center; rotate: -4deg; color: var(--accent); text-align: center; animation: title-in 0.6s cubic-bezier(.3,1.6,.5,1); }
+.logo span { font-size: clamp(26px, 9cqw, 46px); font-weight: 900; line-height: 1; letter-spacing: 1px; text-shadow: 0 3px 0 #b3472c, 0 8px 18px #000a; }
+.logo strong { font-size: clamp(64px, 27cqw, 150px); line-height: 0.9; letter-spacing: 4px; text-shadow: 0 6px 0 #b3472c, 0 12px 0 #5c1f2e, 0 18px 30px #000c; animation: throb 1.8s ease-in-out infinite; }
+.logo p { margin-top: 12px; padding: 4px 12px; border-radius: 12px; background: #1a1242cc; color: var(--text); font-size: 14px; font-weight: 800; rotate: 4deg; }
+.title .band .monster { animation: superhop 0.5s cubic-bezier(.3,0,.4,1) infinite; }
+.title .band .slot:nth-child(even) .monster { animation-delay: -0.25s; }
+.title-status { text-align: center; color: var(--muted); font-size: 15px; font-weight: 800; }

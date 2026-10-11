@@ -1,4 +1,4 @@
-# Boneyard Bangers
+# Graveyard Gigs
 
 A monster band game for the RUN.world October Jam (theme: Monster Mash).
 

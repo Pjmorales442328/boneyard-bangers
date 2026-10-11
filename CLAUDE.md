@@ -1,4 +1,4 @@
-# Boneyard Bangers
+# Graveyard Gigs
 
 Monster band game for the RUN.world October Jam. Vanilla JS + Vite, no framework, no runtime dependencies.
 
@@ -11,7 +11,7 @@ Monster band game for the RUN.world October Jam. Vanilla JS + Vite, no framework
 - `src/features/music/songs/` holds the 12 tracks as note data: `mountainKing.js` is written by hand, `arranged.js` gives a tune, bell line, chords and feel per song and `arrange.js` builds the eight parts. `notation.js` is the shorthand (`line` throws if a melody does not fill the 64-step loop).
 - `features.js` measures a mix, `score.js` turns that into a score and verdict, calibrated per song from its own 70 mixes (no hand-tuned numbers). None of this has browser code; it runs in Node.
 - `src/features/audio/` plays the same note data with samples; `performance.js` reports each note to the stage so animation stays in sync.
-- `src/config/gigs.js` is the tour: each gig lists its track (`song`), the verdicts that clear it (`wants`), who can play (`roster`) and the crowd's costume. `src/main.js` switches between the tour map (`features/tour/tourScreen.js`) and one gig.
+- `src/config/gigs.js` is the tour: each gig lists its track (`song`), the verdicts that clear it (`wants`), who can play (`roster`) and the crowd's costume. `src/main.js` shows the title screen (`features/title/titleScreen.js`, the stage reused as a poster) and then switches between the tour map (`features/tour/tourScreen.js`) and one gig.
 - `src/features/game/game.js` owns one gig: pick, MASH, then a cutscene: the monster cards fold away and the stage takes their room. A win plays an encore under the celebration; a miss stops after one pass. `finale.js` is the title just above the band (cleared, or what the crowd heard) plus the button row that sits where MASH was (Try again / Go for ★★★ / Tour / Next gig). There is no result card. When the stage is tall, `--lift` in `stage.css` raises band, crowd and ground so the action sits mid-stage.
 - `src/features/tour/solutions.js` says whether a verdict clears a gig, ranks the winning bands, and gives stars for the band itself (3 = the best band for that gig, 2 = better half of the rest, 1 = any other win). The user rejected stars counted by tries. `hintFor` gets plainer with each miss: the crowd's wish, what is missing (`brings` in `src/config/monsters.js`), what to trade for it, and from the fourth miss the exact swap. The user rejected a 'N of 4 can stay' hint and naming a monster early.
 - A three-star band sets the `perfect` class on the stage: the showstopper in `stage.css` (flash, spotlights, fireworks, bigger hop; shooting stars for a lullaby).
@@ -23,5 +23,5 @@ Monster band game for the RUN.world October Jam. Vanilla JS + Vite, no framework
 - Crowd sounds are in `public/sfx/<verdict>.mp3`, levels in `SFX_LEVELS` (`src/config/instruments.js`), played by `playCrowd` in `engine.js`. `?unlock` in the address opens every gig.
 - Sample pitches in `src/config/instruments.js` are the measured pitch, one octave above the VCSL file name.
 - Changing notes or scoring can make a gig unwinnable; `npm test` fails if so. Fix the gig's `wants` or `roster`.
-- Best stars per gig are saved in localStorage (`src/lib/storage.js`, key `boneyard-bangers-tour`). RUN SDK storage is not wired yet.
+- Best stars per gig are saved in localStorage (`src/lib/storage.js`, key `graveyard-gigs-tour`, falling back to the old `boneyard-bangers-tour`). RUN SDK storage is not wired yet.
 - Keep files under about 150 lines, one job per file.

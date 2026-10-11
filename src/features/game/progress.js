@@ -3,8 +3,9 @@ import { load, save } from '../../lib/storage.js';
 import { GIGS } from '../../config/gigs.js';
 import { MAX_STARS } from '../tour/solutions.js';
 
-const KEY = 'boneyard-bangers-tour';
-const best = load(KEY, {});
+const KEY = 'graveyard-gigs-tour';
+// ponytail: falls back to the key from the game's first name so early saves carry over; drop it after the jam.
+const best = load(KEY, null) ?? load('boneyard-bangers-tour', {});
 
 export const bestStars = (gigId) => Number(best[gigId] ?? 0);
 export const totalStars = () => GIGS.reduce((sum, g) => sum + bestStars(g.id), 0);

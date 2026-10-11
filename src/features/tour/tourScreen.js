@@ -16,7 +16,7 @@ export function createTour({ onPlay }) {
     );
   });
   const node = el('main', { class: 'tour' },
-    el('header', {}, el('h1', {}, 'Boneyard Bangers'), el('span', { class: 'tour-total' }, `★ ${totalStars()}/${GIGS.length * MAX_STARS}`)),
+    el('header', {}, el('h1', {}, 'Graveyard Gigs'), el('span', { class: 'tour-total' }, `★ ${totalStars()}/${GIGS.length * MAX_STARS}`)),
     el('p', { class: 'tour-lead' }, 'Every crowd wants a different sound. Pick the band that gives it to them.'),
     el('div', { class: 'gigs' }, rows),
   );
