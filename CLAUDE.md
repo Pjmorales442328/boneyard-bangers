@@ -12,9 +12,9 @@ Monster band game for the RUN.world October Jam. Vanilla JS + Vite, no framework
 - `features.js` measures a mix, `score.js` turns that into a score and verdict, calibrated per song from its own 70 mixes (no hand-tuned numbers). None of this has browser code; it runs in Node.
 - `src/features/audio/` plays the same note data with samples; `performance.js` reports each note to the stage so animation stays in sync.
 - `src/config/gigs.js` is the tour: each gig lists its track (`song`), the verdicts that clear it (`wants`), who can play (`roster`) and the crowd's costume. `src/main.js` switches between the tour map (`features/tour/tourScreen.js`) and one gig.
-- `src/features/game/game.js` owns one gig: pick, MASH, verdict after the first pass, stars or a hint, reset.
-- `src/features/tour/hints.js` brute-forces the nearest winning band, so hints are always true. Miss 1 says how many can stay, miss 2 names who must go, miss 3 gives the swap.
-- Crowd reactions are CSS, switched by `data-mood` on `.stage` and `.crowd`; `crowd.js` adds thrown props, costumes (`--hat`, `--prop`) and speech bubbles.
+- `src/features/game/game.js` owns one gig: pick, MASH, then a cutscene on the full stage (the picker folds away). A win plays an encore under the celebration; a miss stops after one pass. `finale.js` is the title over the stage (stars and the try count, or what the crowd heard) with the next-step buttons. There is no result card.
+- `src/features/tour/solutions.js` says whether a verdict clears a gig and lists the winning bands. After a miss the crowd only shouts a wish (`nudge` of the wanted verdict in `src/config/verdicts.js`); the user rejected hints that name a monster or count how many can stay.
+- Crowd reactions are CSS, switched by `data-mood` on `.stage` and `.crowd`; `crowd.js` adds thrown props, costumes (`--hat`, `--prop`) and speech bubbles placed over the ghost that speaks. Two extra moods end the cutscene: `cheer` (win) and `boo` (miss).
 
 ## Rules of thumb
 - Changing a song's notes changes its ranking. Re-run `npm run rank` and `npm test`; the scoring recalibrates itself, but a gig's `wants` or `roster` may need changing.

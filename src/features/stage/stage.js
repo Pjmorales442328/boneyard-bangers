@@ -12,16 +12,13 @@ export function createStage({ gig, onRemove }) {
   const stones = [12, 34, 63, 86].map((x, i) => el('div', { class: 'stone', style: `left:${x}%; --tilt:${[-14, 9, -8, 16][i]}deg; --h:${[1, 0.8, 1.1, 0.9][i]}` }));
   const stars = Array.from({ length: 24 }, (_, i) => el('i', { class: 'star-dot', style: `left:${(i * 37) % 100}%; top:${(i * 53) % 55}%; --d:${(i % 5) * 0.7}s` }));
   const scenery = el('div', { class: 'scenery', style: `filter:hue-rotate(${gig.hue}deg)` }, el('div', { class: 'sky' }, stars, el('div', { class: 'moon' })), el('div', { class: 'hill' }), stones);
-  const node = el('div', { class: 'stage', 'data-mood': 'idle' }, scenery, band, crowd.node);
+  const node = el('div', { class: 'stage', 'data-mood': 'idle' }, scenery, band, crowd.node, crowd.bubbles);
   const views = {};
-  let picks = [];
-  let blamed = null;
 
   // Monster size follows the stage so four always fit side by side without poking out of the top.
   new ResizeObserver(([{ contentRect: r }]) => node.style.setProperty('--s', Math.min(r.width / SLOTS / 460, r.height / 1150).toFixed(4))).observe(node);
 
   function setBand(ids) {
-    picks = ids;
     Object.keys(views).forEach((id) => delete views[id]);
     slots.forEach((slot, i) => {
       slot.replaceChildren();
@@ -31,13 +28,6 @@ export function createStage({ gig, onRemove }) {
       views[id].node.addEventListener('click', () => onRemove(id));
       slot.append(views[id].node);
     });
-    blame(blamed);
-  }
-
-  // Marks the monster the crowd wants gone; it stays marked until the next MASH.
-  function blame(id) {
-    blamed = id;
-    picks.forEach((p) => views[p]?.node.classList.toggle('blamed', p === id));
   }
 
   function setMood(mood, beatSeconds, won = false) {
@@ -47,5 +37,5 @@ export function createStage({ gig, onRemove }) {
     crowd.setMood(mood, won);
   }
 
-  return { node, setBand, setMood, blame, say: crowd.say, hit: (id, note) => views[id]?.hit(note.v) };
+  return { node, setBand, setMood, say: crowd.say, hit: (id, note) => views[id]?.hit(note.v) };
 }

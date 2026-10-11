@@ -6,7 +6,7 @@ import { SLOTS } from '../src/config/song.js';
 import { scoreMix } from '../src/features/music/score.js';
 import { combos } from '../src/lib/combos.js';
 import { GIGS } from '../src/config/gigs.js';
-import { wins, solutions, hintFor } from '../src/features/tour/hints.js';
+import { solutions } from '../src/features/tour/solutions.js';
 
 const rank = (song) => combos(PART_IDS, SLOTS).map((ids) => ({ ids, ...scoreMix(ids, song) })).sort((a, b) => b.score - a.score);
 const tally = (rows) => Object.entries(Object.groupBy(rows, (r) => r.verdict)).map(([k, v]) => `${k}:${v.length}`).join('  ');
@@ -20,20 +20,11 @@ function checkSongs() {
   }
 }
 
-// Every gig must be winnable, and following the swap hints from any losing band must reach a win.
+// Every gig must be winnable.
 function checkGigs() {
   for (const gig of GIGS) {
-    const song = SONGS[gig.song];
-    assert.ok(song, `gig "${gig.id}" names an unknown song`);
+    assert.ok(SONGS[gig.song], `gig "${gig.id}" names an unknown song`);
     assert.ok(solutions(gig).length >= 1, `gig "${gig.id}" has no winning band`);
-    for (const start of combos(gig.roster, SLOTS)) {
-      let picks = start;
-      for (let swaps = 0; !wins(gig, scoreMix(picks, song).verdict); swaps++) {
-        assert.ok(swaps < SLOTS, `gig "${gig.id}": hints do not lead ${start} to a win`);
-        const [out, into] = hintFor(gig, picks, 3).swap;
-        picks = picks.map((id) => (id === out ? into : id));
-      }
-    }
   }
 }
 

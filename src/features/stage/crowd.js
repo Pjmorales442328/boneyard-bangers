@@ -2,7 +2,7 @@
 import { el } from '../../lib/dom.js';
 
 const GHOSTS = 9;
-const BUBBLE_GAP_MS = 1100;
+const BUBBLE_GAP_MS = 1200;
 const PROPS = {
   legend: { count: 36, cls: 'confetti', text: '' },
   dance: { count: 8, cls: 'huh', text: '♪' },
@@ -12,6 +12,8 @@ const PROPS = {
   sleep: { count: 6, cls: 'zzz', text: 'z' },
   dizzy: { count: 8, cls: 'star', text: '✦' },
   offbeat: { count: 5, cls: 'huh', text: '?' },
+  cheer: { count: 9, cls: 'huh', text: '♥' },
+  boo: { count: 7, cls: 'toss', text: '🍅' },
 };
 const rand = (a, b) => a + Math.random() * (b - a);
 
@@ -19,7 +21,7 @@ export function createCrowd(gig) {
   const ghosts = Array.from({ length: GHOSTS }, (_, i) => el('div', { class: 'ghost', style: `--i:${i}; --r:${rand(0.6, 1.4).toFixed(2)}; --size:${rand(0.85, 1.15).toFixed(2)}` }, el('i'), el('i'), el('b')));
   const props = el('div', { class: 'props' });
   const bubbles = el('div', { class: 'bubbles' });
-  const node = el('div', { class: 'crowd', 'data-mood': 'idle', style: `--hat:'${gig.hat}'; --prop:'${gig.prop}'` }, props, ghosts, bubbles);
+  const node = el('div', { class: 'crowd', 'data-mood': 'idle', style: `--hat:'${gig.hat}'; --prop:'${gig.prop}'` }, props, ghosts);
   let timers = [];
 
   const scatter = ({ count, cls, text }) => {
@@ -36,12 +38,18 @@ export function createCrowd(gig) {
     if (won && mood !== 'legend') scatter(PROPS.legend);
   }
 
-  // Ghosts call out one line after another; the bubbles stay until the next call.
-  function say(lines) {
+  // One ghost after another calls out; each bubble sits over the ghost that said it and fades, unless the last should stay.
+  function say(lines, stay = false) {
     timers.forEach(clearTimeout);
     bubbles.replaceChildren();
-    timers = lines.map((text, i) => setTimeout(() => bubbles.append(el('p', { class: i % 2 ? 'bubble right' : 'bubble' }, text)), i * BUBBLE_GAP_MS));
+    const first = Math.floor(rand(0, 5));
+    timers = lines.map((text, n) => setTimeout(() => {
+      // Speakers come from the middle five ghosts so a bubble never runs off the stage.
+      const ghost = 2 + ((first + n * 2) % 5);
+      const last = n === lines.length - 1;
+      bubbles.replaceChildren(el('p', { class: stay && last ? 'bubble stay' : 'bubble', style: `--x:${(1 + (ghost + 0.5) * (98 / GHOSTS)).toFixed(1)}%` }, text));
+    }, n * BUBBLE_GAP_MS));
   }
 
-  return { node, setMood, say };
+  return { node, bubbles, setMood, say };
 }
