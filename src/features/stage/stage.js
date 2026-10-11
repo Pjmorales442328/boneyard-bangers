@@ -12,7 +12,10 @@ export function createStage({ gig, onRemove }) {
   const stones = [12, 34, 63, 86].map((x, i) => el('div', { class: 'stone', style: `left:${x}%; --tilt:${[-14, 9, -8, 16][i]}deg; --h:${[1, 0.8, 1.1, 0.9][i]}` }));
   const stars = Array.from({ length: 24 }, (_, i) => el('i', { class: 'star-dot', style: `left:${(i * 37) % 100}%; top:${(i * 53) % 55}%; --d:${(i % 5) * 0.7}s` }));
   const scenery = el('div', { class: 'scenery', style: `filter:hue-rotate(${gig.hue}deg)` }, el('div', { class: 'sky' }, stars, el('div', { class: 'moon' })), el('div', { class: 'hill' }), stones);
-  const node = el('div', { class: 'stage', 'data-mood': 'idle' }, scenery, band, crowd.node, crowd.bubbles);
+  // Spotlights and fireworks, shown only while the stage has the `perfect` class.
+  const fireworks = Array.from({ length: 8 }, (_, i) => el('b', { class: 'firework', style: `--x:${8 + ((i * 31) % 84)}%; --y:${6 + ((i * 17) % 34)}%; --hue:${i * 47}; --d:${(i * 0.37).toFixed(2)}s` }));
+  const showstopper = el('div', { class: 'showstopper' }, el('i', { class: 'beam' }), el('i', { class: 'beam' }), el('i', { class: 'beam' }), fireworks);
+  const node = el('div', { class: 'stage', 'data-mood': 'idle' }, scenery, showstopper, band, crowd.node, crowd.bubbles);
   const views = {};
 
   // Monster size follows the stage so four always fit side by side without poking out of the top.
@@ -30,9 +33,10 @@ export function createStage({ gig, onRemove }) {
     });
   }
 
-  function setMood(mood, beatSeconds, won = false) {
+  function setMood(mood, beatSeconds, won = false, perfect = false) {
     node.dataset.mood = mood;
     node.classList.toggle('won', won);
+    node.classList.toggle('perfect', perfect);
     node.style.setProperty('--beat', `${beatSeconds}s`);
     crowd.setMood(mood, won);
   }

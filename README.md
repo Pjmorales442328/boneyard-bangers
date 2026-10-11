@@ -2,7 +2,7 @@
 
 A monster band game for the RUN.world October Jam (theme: Monster Mash).
 
-The monster band goes on a tour of 12 gigs, each with its own track. Each gig has a ghost crowd in costume that wants one style of music: a lullaby for the nursery, a grave rumble for the demolition crew, a perfect banger for the final. Pick four monsters, hit **MASH**, and the crowd reacts. The gig then plays out as a cutscene on the stage: the ghosts cheer and the gig is ticked off, or they boo, throw tomatoes and shout what they wanted instead. New monsters join as the tour goes on.
+The monster band goes on a tour of 12 gigs, each with its own track. Each gig has a ghost crowd in costume that wants one style of music: a lullaby for the nursery, a grave rumble for the demolition crew, a perfect banger for the final. Pick four monsters, hit **MASH**, and the crowd reacts. The gig then plays out as a cutscene on the stage: the ghosts cheer and the band earns up to 3 stars, or they boo, throw tomatoes and shout a hint that gets plainer with every miss. Stars rate the band, not the number of tries: only the best band for each crowd earns 3, and it gets a showstopper with spotlights and fireworks. New monsters join as the tour goes on.
 
 The verdict is not hand-written per mix. The game measures the notes each monster plays and scores the mix on four things, calibrated per track:
 
@@ -20,7 +20,7 @@ npm install
 npm run dev      # play at the address it prints
 npm run build    # production build in dist/
 npm run rank     # verdict counts per track and winning bands per gig; add a song id for its full table
-npm test         # check every track scores sensibly and every gig can be won
+npm test         # check every track scores sensibly and every gig can be won by following the hints
 ```
 
 ## Folder structure
@@ -32,8 +32,8 @@ src/
   features/music/songs/  the 12 tracks as note data
   features/audio/    Web Audio engine and performance scheduler
   features/stage/    monsters, instruments, ghost crowd, scenery
-  features/game/     picker, cutscene ending, one gig's flow, cleared-gig progress
-  features/tour/     tour map screen and win check
+  features/game/     picker, cutscene ending, one gig's flow, star progress
+  features/tour/     tour map screen, win check, stars and hints
   lib/               small DOM and storage helpers
   styles/            CSS, one file per area
 scripts/             ranking check, sample and crowd-sound conversion, art copy

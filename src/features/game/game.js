@@ -7,15 +7,17 @@ import { SONGS } from '../music/songs/index.js';
 import { perform } from '../audio/performance.js';
 import { now, playCrowd } from '../audio/engine.js';
 import { createStage } from '../stage/stage.js';
-import { wins } from '../tour/solutions.js';
+import { wins, starsFor, hintFor, MAX_STARS } from '../tour/solutions.js';
 import { createPicker } from './picker.js';
 import { createFinale } from './finale.js';
-import { record } from './progress.js';
+import { record, bestStars, starRow } from './progress.js';
 
 // How the second pass of the song changes for a verdict: the riot speeds up, the lullaby winds down.
 const ENCORE = { legend: { tempo: 1.18 }, dance: { tempo: 1.06 }, sleep: { tempo: 0.78, fade: true } };
 // Seconds the crowd acts out what it heard before the title comes up.
 const REVEAL_GAP = 1.4;
+// What a ghost shouts after a win, by stars earned.
+const CHEERS = ['', 'That will do nicely!', 'Just what we wanted!', 'PERFECT! Best band ever!'];
 
 export function createGame({ gig, onExit, onNext }) {
   const song = SONGS[gig.song];
@@ -23,6 +25,7 @@ export function createGame({ gig, onExit, onNext }) {
   let picks = [];
   let playing = null;
   let busy = false;
+  let misses = 0;
   let cleared = false;
 
   let hushCrowd = () => {};
@@ -32,13 +35,15 @@ export function createGame({ gig, onExit, onNext }) {
   const picker = createPicker({ gig, onToggle: toggle, onMash: mash });
   const finale = createFinale({ gig, onAgain: reset, onExit: leave, onNext: onNext && (() => { stopPlaying(); onNext(); }) });
   stage.node.append(finale.title);
+  const best = el('span', { class: 'best-stars', title: 'Your best at this gig' });
   const node = el('main', { class: 'game' },
-    el('header', {}, el('button', { class: 'back', type: 'button', 'aria-label': 'Back to the tour', onclick: leave }, '‹'), el('h1', {}, gig.name)),
+    el('header', {}, el('button', { class: 'back', type: 'button', 'aria-label': 'Back to the tour', onclick: leave }, '‹'), el('h1', {}, gig.name), best),
     el('p', { class: 'ask' }, `${gig.hat} “${gig.ask}”`, el('small', {}, `♪ ${song.title}`)),
     stage.node,
     el('div', { class: 'panel' }, picker.node, finale.foot),
   );
 
+  const showBest = () => { best.textContent = starRow(bestStars(gig.id)); };
   const after = (audioTime, fn) => setTimeout(fn, Math.max(0, (audioTime - now()) * 1000));
 
   function refresh() {
@@ -64,7 +69,11 @@ export function createGame({ gig, onExit, onNext }) {
     stopPlaying();
     const { verdict } = scoreMix(picks, song);
     const won = wins(gig, verdict);
+    const stars = won ? starsFor(gig, picks) : 0;
+    const perfect = stars === MAX_STARS;
     cleared = won;
+    if (!won) misses += 1;
+    const hint = won ? null : hintFor(gig, picks, misses).text;
     const encore = (won && ENCORE[verdict]) || { tempo: 1 };
     node.classList.add('performing');
     finale.wait();
@@ -78,17 +87,17 @@ export function createGame({ gig, onExit, onNext }) {
 
     at((run.loopStarts[0] + heard) / 2, () => stage.say(['Hmm...']));
     at(heard, () => {
-      stage.setMood(verdict, beat / encore.tempo, won);
+      stage.setMood(verdict, beat / encore.tempo, won, perfect);
       hushCrowd = playCrowd(verdict);
-      // After a miss the crowd's wish stays up while the player changes the band.
-      stage.say([VERDICTS[verdict].say, won ? 'Just what we wanted!' : VERDICTS[gig.wants[0]].nudge], !won);
-      if (won) record(gig.id);
+      // After a miss the hint stays up while the player changes the band.
+      stage.say([VERDICTS[verdict].say, won ? CHEERS[stars] : hint], !won);
+      if (won) { record(gig.id, stars); showBest(); }
     });
     at(heard + REVEAL_GAP, () => {
       if (!won) stage.setMood('boo', beat);
-      finale.show({ won, verdict });
+      finale.show({ verdict, stars });
     });
-    if (won && !['legend', 'sleep'].includes(verdict)) at(run.end, () => stage.setMood('cheer', beat, true));
+    if (won && !['legend', 'sleep'].includes(verdict)) at(run.end, () => stage.setMood('cheer', beat, true, perfect));
   }
 
   // After a miss the band stays so the player can change one thing; after a win the gig starts fresh.
@@ -98,10 +107,11 @@ export function createGame({ gig, onExit, onNext }) {
     node.classList.remove('performing');
     finale.title.hidden = true;
     stage.setMood('idle', beat);
-    if (cleared) { picks = []; cleared = false; stage.say([]); }
+    if (cleared) { picks = []; misses = 0; cleared = false; stage.say([]); }
     refresh();
   }
 
   refresh();
+  showBest();
   return { node };
 }

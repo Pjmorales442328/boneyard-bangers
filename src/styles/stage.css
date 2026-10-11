@@ -1,6 +1,6 @@
 .stage { position: relative; flex: 1; min-height: 190px; overflow: hidden; border-radius: 22px; background: #1a1242; isolation: isolate; container-type: size;
   /* Spare height beyond the band, the crowd and a title; half of it goes under the crowd so the action sits mid-stage, not at the bottom. */
-  --lift: max(0px, (100cqh - 65cqw - 110px) / 2); --band-bottom: calc(min(17%, 15cqw) + var(--lift)); }
+  --lift: max(0px, (100cqh - 65cqw - 150px) / 2); --band-bottom: calc(min(17%, 15cqw) + var(--lift)); }
 /* Night falls for a lullaby; the bubbles and the title stay bright above it. */
 .stage::after { content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none; background: #070418; opacity: 0; transition: opacity 1.2s; }
 /* The sky sits outside .scenery so the venue tint does not recolour it. */
@@ -33,3 +33,23 @@
 .stage[data-mood='quake'] .hill::after { content: ''; position: absolute; left: 44%; top: 0; width: 12%; height: 100%; background: #120b30; clip-path: polygon(40% 0, 62% 0, 48% 22%, 72% 40%, 40% 62%, 66% 100%, 30% 100%, 22% 62%, 50% 42%, 26% 22%); }
 .stage[data-mood='meh'] .ghost:nth-child(3n) { translate: 0 130%; transition: translate 2.5s ease-in 0.6s; }
 .stage.won .band .monster { animation: hop var(--beat, 0.5s) infinite; }
+
+/* Showstopper: the best band for a gig gets a flash, sweeping spotlights, fireworks and a bigger hop. A perfect lullaby gets shooting stars instead. */
+.showstopper { position: absolute; inset: 0; display: none; pointer-events: none; }
+.stage.perfect .showstopper { display: block; }
+.showstopper::before { content: ''; position: absolute; inset: 0; background: #fff; animation: flash 0.8s ease-out forwards; }
+@keyframes flash { from { opacity: 0.95; } to { opacity: 0; } }
+.beam { position: absolute; top: -6%; width: 34cqw; height: 120%; margin-left: -17cqw; transform-origin: 50% 0; clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); background: linear-gradient(hsl(var(--hue) 100% 80% / 0.75), transparent 88%); mix-blend-mode: screen; animation: sweep 1.9s ease-in-out infinite alternate; }
+.beam:nth-child(1) { left: 12%; --hue: 320; --from: -6deg; --to: -38deg; }
+.beam:nth-child(2) { left: 50%; --hue: 50; --from: 24deg; --to: -24deg; animation-duration: 2.5s; }
+.beam:nth-child(3) { left: 88%; --hue: 190; --from: 6deg; --to: 38deg; }
+@keyframes sweep { from { rotate: var(--from); } to { rotate: var(--to); } }
+.firework { position: absolute; left: var(--x); top: var(--y); width: 5px; height: 5px; border-radius: 50%; color: hsl(var(--hue) 100% 68%); background: currentColor; box-shadow: 42px 0px 0 0 currentColor, 36px 21px 0 0 currentColor, 21px 36px 0 0 currentColor, 0px 42px 0 0 currentColor, -21px 36px 0 0 currentColor, -36px 21px 0 0 currentColor, -42px 0px 0 0 currentColor, -36px -21px 0 0 currentColor, -21px -36px 0 0 currentColor, 0px -42px 0 0 currentColor, 21px -36px 0 0 currentColor, 36px -21px 0 0 currentColor, 22px 0px 0 0 currentColor, 0px 22px 0 0 currentColor, -22px 0px 0 0 currentColor, 0px -22px 0 0 currentColor; opacity: 0; animation: burst 1.5s ease-out infinite var(--d); }
+@keyframes burst { 0% { scale: 0.05; opacity: 1; } 60% { opacity: 1; } to { scale: 1.5; opacity: 0; } }
+.stage.perfect:not([data-mood='sleep']) .band .monster { animation: superhop var(--beat, 0.5s) cubic-bezier(.3,0,.4,1) infinite; }
+.stage.perfect .band .slot:nth-child(even) .monster { animation-delay: calc(var(--beat, 0.5s) / -2); }
+@keyframes superhop { 50% { translate: 0 -18%; rotate: 5deg; } }
+.stage.perfect:not([data-mood='sleep']) .moon { animation: moon-pulse var(--beat, 0.5s) infinite; }
+.stage.perfect[data-mood='sleep'] .showstopper::before, .stage.perfect[data-mood='sleep'] .beam { display: none; }
+.stage.perfect[data-mood='sleep'] .firework { width: 46px; height: 2px; border-radius: 2px; color: #fff; background: linear-gradient(90deg, #fff, transparent); box-shadow: none; rotate: -20deg; animation: shoot 2.6s linear infinite var(--d); }
+@keyframes shoot { from { translate: 40cqw -14cqw; opacity: 0; } 15%, 60% { opacity: 1; } to { translate: -50cqw 18cqw; opacity: 0; } }

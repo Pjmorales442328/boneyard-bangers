@@ -1,6 +1,9 @@
-// The end of the cutscene: a title over the band saying how it went, and the next-step buttons where MASH was.
+// The end of the cutscene: a title over the band with the stars the band earned, and the next-step buttons where MASH was.
 import { el } from '../../lib/dom.js';
 import { VERDICTS } from '../../config/verdicts.js';
+import { MAX_STARS } from '../tour/solutions.js';
+
+const WON = ['', 'Gig cleared!', 'Great gig!', 'PERFECT MASH!'];
 
 export function createFinale({ gig, onAgain, onExit, onNext }) {
   const title = el('div', { class: 'finale', hidden: '' });
@@ -14,16 +17,22 @@ export function createFinale({ gig, onAgain, onExit, onNext }) {
     foot.replaceChildren(el('p', { class: 'listening' }, 'The crowd is listening...'));
   }
 
-  function show({ won, verdict }) {
+  // `stars` is 0 for a miss.
+  function show({ verdict, stars }) {
     const v = VERDICTS[verdict];
-    title.replaceChildren(
-      el('h2', {}, won ? `${gig.hat} Gig cleared!` : `${v.icon} ${v.title}`),
-      el('p', { class: 'finale-note' }, won ? `${v.icon} ${v.title}` : `They wanted: ${wanted}`),
-    );
+    const perfect = stars === MAX_STARS;
+    title.className = perfect ? 'finale perfect' : 'finale';
+    title.replaceChildren(...(stars
+      ? [
+        el('p', { class: 'earned' }, Array.from({ length: MAX_STARS }, (_, i) => el('span', { class: i < stars ? 'on' : '', style: `--i:${i}` }, '★'))),
+        el('h2', {}, WON[stars]),
+        el('p', { class: 'finale-note' }, perfect ? 'The best band this crowd could get!' : 'They liked it. One band would suit them even better.'),
+      ]
+      : [el('h2', {}, `${v.icon} ${v.title}`), el('p', { class: 'finale-note' }, `They wanted: ${wanted}`)]));
     title.hidden = false;
-    foot.replaceChildren(...(won
-      ? [button('Tour', onExit, true), onNext ? button('Next gig ›', onNext) : null]
-      : [button('Try again', onAgain)]).filter(Boolean));
+    const buttons = !stars ? [button('Try again', onAgain)]
+      : [perfect ? button('Tour', onExit, true) : button(`Go for ${'★'.repeat(MAX_STARS)}`, onAgain, true), onNext ? button('Next gig ›', onNext) : button('Back to the tour', onExit)];
+    foot.replaceChildren(...buttons);
   }
 
   return { title, foot, wait, show };
