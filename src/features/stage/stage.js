@@ -14,8 +14,8 @@ export function createStage({ onRemove }) {
   const node = el('div', { class: 'stage', 'data-mood': 'idle' }, el('div', { class: 'sky' }, stars, el('div', { class: 'moon' })), el('div', { class: 'hill' }), stones, band, crowd.node);
   const views = {};
 
-  // Monster size follows the stage width so four always fit.
-  new ResizeObserver(([entry]) => node.style.setProperty('--s', (entry.contentRect.width / SLOTS / 430).toFixed(4))).observe(node);
+  // Monster size follows the stage so four always fit side by side without poking out of the top.
+  new ResizeObserver(([{ contentRect: r }]) => node.style.setProperty('--s', Math.min(r.width / SLOTS / 460, r.height / 1150).toFixed(4))).observe(node);
 
   function setBand(ids) {
     Object.keys(views).forEach((id) => delete views[id]);

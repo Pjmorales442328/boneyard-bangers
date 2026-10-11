@@ -1,10 +1,10 @@
 /* Header, monster cards, MASH button and the result card. */
 .game { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
 .game header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px; }
-.game h1 { font-size: clamp(15px, 4.6vw, 20px); color: var(--accent); text-shadow: 0 2px 0 #b3472c; white-space: nowrap; }
+.game h1 { font-size: clamp(13px, 4.3vw, 20px); color: var(--accent); text-shadow: 0 2px 0 #b3472c; white-space: nowrap; }
 
 .gallery { display: flex; gap: 3px; }
-.badge { width: 23px; height: 23px; display: grid; place-items: center; border-radius: 50%; background: var(--panel); color: #ffffff55; font-size: 13px; font-weight: 800; }
+.badge { width: clamp(18px, 5.4vw, 26px); aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; background: var(--panel); color: #ffffff55; font-size: 13px; font-weight: 800; }
 .badge.found { background: var(--card); color: inherit; font-size: 15px; box-shadow: 0 0 0 2px var(--accent); }
 
 .panel { position: relative; }
@@ -20,6 +20,8 @@
 .mash:disabled { background: #564a86; color: #b9addf; box-shadow: 0 6px 0 #2c2258; cursor: default; }
 .mash:not(:disabled) { animation: nudge 1.2s ease-in-out infinite; }
 @keyframes nudge { 50% { scale: 1.03; } }
+
+@media (max-height: 700px) { .card { --s: 0.075; } .card small { display: none; } .mash { padding: 10px; font-size: 19px; } }
 
 /* While the band plays, the picker fades back; the result card then takes its place. */
 .performing .picker { opacity: 0.25; pointer-events: none; transition: opacity 0.3s; }

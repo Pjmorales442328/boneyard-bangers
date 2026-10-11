@@ -23,7 +23,7 @@ function syncopation(notes) {
 }
 
 // Drums are several voices (kick, snare, hat) and each is counted alone; a pitched part is one voice.
-const voices = (notes) => (isPitched(notes[0]) ? [notes] : Object.values(Object.groupBy(notes, (n) => n.p)));
+const voices = (notes) => (isPitched(notes[0]) ? [notes] : [...new Set(notes.map((n) => n.p))].map((p) => notes.filter((n) => n.p === p)));
 
 export function measure(ids) {
   const parts = ids.map((id) => PARTS[id]);

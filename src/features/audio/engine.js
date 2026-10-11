@@ -28,12 +28,16 @@ export async function initAudio() {
   if (ctx) return ctx;
   ctx = new AudioContext();
   const limiter = new DynamicsCompressorNode(ctx, { threshold: -12, ratio: 6, attack: 0.003, release: 0.2 });
-  limiter.connect(ctx.destination);
-  dry = new GainNode(ctx, { gain: 0.9 });
-  wet = new ConvolverNode(ctx, { buffer: roomImpulse() });
+  // Rumble below what small speakers can play only eats headroom, and low notes in the reverb turn to mud.
+  const rumbleCut = new BiquadFilterNode(ctx, { type: 'highpass', frequency: 38 });
+  // The compressor adds its own make-up gain, so trim after it to keep peaks under the ceiling.
+  rumbleCut.connect(limiter).connect(new GainNode(ctx, { gain: 0.74 })).connect(ctx.destination);
+  dry = new GainNode(ctx, { gain: 0.8 });
+  wet = new BiquadFilterNode(ctx, { type: 'highpass', frequency: 260 });
+  const room = new ConvolverNode(ctx, { buffer: roomImpulse() });
   const wetLevel = new GainNode(ctx, { gain: 0.5 });
-  dry.connect(limiter);
-  wet.connect(wetLevel).connect(limiter);
+  dry.connect(rumbleCut);
+  wet.connect(room).connect(wetLevel).connect(rumbleCut);
   await Promise.all(SAMPLE_FILES.map(loadSample));
   await ctx.resume();
   return ctx;
