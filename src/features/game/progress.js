@@ -1,21 +1,19 @@
-// Remembers which crowd reactions the player has found and which mixes they have tried.
+// Remembers the best star count for each gig and which gigs are open.
 import { load, save } from '../../lib/storage.js';
+import { GIGS } from '../../config/gigs.js';
 
-const KEY = 'boneyard-bangers-progress';
-export const TOTAL_MIXES = 70;
-const state = load(KEY, { found: [], tried: {}, best: 0 });
+const KEY = 'boneyard-bangers-tour';
+const stars = load(KEY, {});
 
-export const mixKey = (ids) => [...ids].sort().join('+');
+export const MAX_STARS = 3;
+export const starsFor = (gigId) => stars[gigId] ?? 0;
+export const totalStars = () => GIGS.reduce((sum, g) => sum + starsFor(g.id), 0);
+// A gig opens once the one before it has been cleared.
+export const isOpen = (index) => index === 0 || starsFor(GIGS[index - 1].id) > 0;
+export const starsForTry = (tries) => Math.max(1, MAX_STARS + 1 - tries);
 
-// Returns what was new about this result so the UI can celebrate it.
-export function record(ids, result) {
-  const key = mixKey(ids);
-  const news = { newReaction: !state.found.includes(result.verdict), newMix: !(key in state.tried), newBest: result.score > state.best };
-  if (news.newReaction) state.found.push(result.verdict);
-  state.tried[key] = result.score;
-  state.best = Math.max(state.best, result.score);
-  save(KEY, state);
-  return news;
+export function record(gigId, earned) {
+  if (earned <= starsFor(gigId)) return;
+  stars[gigId] = earned;
+  save(KEY, stars);
 }
-
-export const progress = () => ({ found: state.found, triedCount: Object.keys(state.tried).length, best: state.best });

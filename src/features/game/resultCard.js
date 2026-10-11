@@ -1,26 +1,25 @@
-// Shows the crowd's verdict, the score, and the four measurements behind it.
+// Shows how the gig went: cleared with stars, or what the crowd heard and the hint to try next.
 import { el } from '../../lib/dom.js';
-import { VERDICTS, VERDICT_IDS } from '../../config/verdicts.js';
-import { TOTAL_MIXES } from './progress.js';
+import { VERDICTS } from '../../config/verdicts.js';
+import { MAX_STARS } from './progress.js';
 
-const METERS = [['groove', 'Groove'], ['tight', 'Tightness'], ['smooth', 'Harmony'], ['full', 'Full band']];
-
-export function createResultCard({ onAgain }) {
+export function createResultCard({ gig, onAgain, onExit }) {
   const node = el('div', { class: 'result', hidden: '' });
+  const wanted = VERDICTS[gig.wants[0]].title;
 
-  function show(result, news, prog) {
-    const v = VERDICTS[result.verdict];
+  function show({ won, verdict, stars, hint }) {
+    const v = VERDICTS[verdict];
     node.replaceChildren(
       el('div', { class: 'result-head' },
         el('span', { class: 'result-icon' }, v.icon),
-        el('div', {}, el('h2', {}, v.title), el('p', {}, v.line)),
-        el('div', { class: 'score' }, el('b', {}, String(result.score)), el('span', {}, '★'.repeat(result.stars) + '☆'.repeat(5 - result.stars))),
+        el('div', {}, el('h2', {}, won ? 'Gig cleared!' : v.title), el('p', {}, won ? `${v.title}: just what they wanted.` : `They wanted: ${wanted}`)),
       ),
-      el('div', { class: 'meters' }, METERS.map(([key, label]) => el('div', { class: 'meter' }, el('span', {}, label), el('div', { class: 'bar' }, el('i', { style: `width:${Math.round(result.parts[key] * 100)}%` }))))),
-      el('p', { class: 'hint' }, news.newReaction ? `New reaction found! ${v.hint}` : v.hint),
+      won
+        ? el('p', { class: 'earned' }, Array.from({ length: MAX_STARS }, (_, i) => el('span', { class: i < stars ? 'on' : '', style: `--i:${i}` }, '★')))
+        : el('p', { class: 'hint' }, hint.text),
       el('div', { class: 'result-foot' },
-        el('span', {}, `Reactions ${prog.found.length}/${VERDICT_IDS.length} · Mixes ${prog.triedCount}/${TOTAL_MIXES} · Best ${prog.best}`),
-        el('button', { class: 'again', type: 'button', onclick: onAgain }, 'Try another mix'),
+        won && stars < MAX_STARS ? el('button', { class: 'again quiet', type: 'button', onclick: onAgain }, 'Replay') : null,
+        el('button', { class: 'again', type: 'button', onclick: won ? onExit : onAgain }, won ? 'Back to the tour' : 'Try again'),
       ),
     );
     node.hidden = false;

@@ -1,4 +1,5 @@
 .stage { position: relative; flex: 1; min-height: 190px; overflow: hidden; border-radius: 22px; background: linear-gradient(#1a1242, #46307c 62%, #2d1f55 62%); isolation: isolate; transition: filter 1.2s; }
+.scenery { position: absolute; inset: 0; }
 .sky { position: absolute; inset: 0 0 38% 0; }
 .moon { position: absolute; right: 12%; top: 10%; width: 74px; aspect-ratio: 1; border-radius: 50%; background: #fff6cf; box-shadow: 0 0 50px 14px #fff6cf55, inset -10px -6px 0 #eadf9d; }
 .star-dot { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; animation: twinkle 3s infinite var(--d); }
@@ -11,6 +12,9 @@
 .slot { flex: 1; min-width: 0; display: flex; justify-content: center; align-items: flex-end; }
 .slot .monster { margin: 0 -40%; cursor: pointer; animation: pop-in 0.35s cubic-bezier(.3,1.7,.5,1); }
 @keyframes pop-in { from { transform: scale(0.3) translateY(40px); opacity: 0; } }
+.monster.blamed { filter: drop-shadow(0 0 10px #ff4d4d) drop-shadow(0 0 3px #ff4d4d); }
+.monster.blamed::after { content: '👎'; position: absolute; left: 50%; top: -6%; translate: -50% 0; font-size: 26px; animation: thumb 0.7s ease-in-out infinite; }
+@keyframes thumb { 50% { translate: -50% -6px; } }
 .empty-spot { width: 62%; aspect-ratio: 1; margin-bottom: 14%; display: grid; place-items: center; border: 3px dashed #ffffff40; border-radius: 50%; font: 800 26px system-ui; color: #ffffff55; }
 
 .stage[data-mood='quake'] { animation: quake 0.16s infinite; }
@@ -21,3 +25,7 @@
 @keyframes moon-pulse { 50% { scale: 1.25; box-shadow: 0 0 90px 30px #fff6cf99, inset -10px -6px 0 #eadf9d; } }
 .stage[data-mood='legend'] .band .monster { animation: hop var(--beat, 0.5s) infinite; }
 @keyframes hop { 50% { translate: 0 -9%; } }
+.stage[data-mood='legend'] .moon { background: repeating-conic-gradient(#fff6cf 0 20deg, #ff8ad8 20deg 40deg, #7ad7ff 40deg 60deg); }
+.stage[data-mood='quake'] .hill::after { content: ''; position: absolute; left: 44%; top: 0; width: 12%; height: 100%; background: #120b30; clip-path: polygon(40% 0, 62% 0, 48% 22%, 72% 40%, 40% 62%, 66% 100%, 30% 100%, 22% 62%, 50% 42%, 26% 22%); }
+.stage[data-mood='meh'] .ghost:nth-child(3n) { translate: 0 130%; transition: translate 2.5s ease-in 0.6s; }
+.stage.won .band .monster { animation: hop var(--beat, 0.5s) infinite; }
