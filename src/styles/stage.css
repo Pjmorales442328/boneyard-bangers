@@ -1,0 +1,23 @@
+.stage { position: relative; flex: 1; min-height: 300px; overflow: hidden; border-radius: 22px; background: linear-gradient(#1a1242, #46307c 62%, #2d1f55 62%); isolation: isolate; transition: filter 1.2s; }
+.sky { position: absolute; inset: 0 0 38% 0; }
+.moon { position: absolute; right: 12%; top: 10%; width: 74px; aspect-ratio: 1; border-radius: 50%; background: #fff6cf; box-shadow: 0 0 50px 14px #fff6cf55, inset -10px -6px 0 #eadf9d; }
+.star-dot { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; animation: twinkle 3s infinite var(--d); }
+@keyframes twinkle { 50% { opacity: 0.2; } }
+.hill { position: absolute; left: -20%; right: -20%; top: 50%; height: 60%; border-radius: 50% 50% 0 0 / 30% 30% 0 0; background: #37266a; }
+.stone { position: absolute; top: 44%; width: 34px; height: calc(46px * var(--h)); border-radius: 17px 17px 3px 3px; background: #6f62a0; box-shadow: inset -6px 0 0 #5a4e8a; transform-origin: 50% 100%; transition: rotate 0.5s cubic-bezier(.3,1.8,.5,1); }
+.stone::after { content: 'RIP'; position: absolute; inset: 9px 0 auto; text-align: center; font: 700 9px system-ui; color: #453a70; }
+
+.band { position: absolute; left: 2%; right: 2%; bottom: 17%; display: flex; align-items: flex-end; }
+.slot { flex: 1; min-width: 0; display: flex; justify-content: center; align-items: flex-end; }
+.slot .monster { margin: 0 -40%; cursor: pointer; animation: pop-in 0.35s cubic-bezier(.3,1.7,.5,1); }
+@keyframes pop-in { from { transform: scale(0.3) translateY(40px); opacity: 0; } }
+.empty-spot { width: 62%; aspect-ratio: 1; margin-bottom: 14%; display: grid; place-items: center; border: 3px dashed #ffffff40; border-radius: 50%; font: 800 26px system-ui; color: #ffffff55; }
+
+.stage[data-mood='quake'] { animation: quake 0.16s infinite; }
+.stage[data-mood='quake'] .stone { rotate: var(--tilt); }
+@keyframes quake { 25% { translate: -4px 2px; } 75% { translate: 4px -2px; } }
+.stage[data-mood='sleep'] { filter: brightness(0.55) saturate(0.7); }
+.stage[data-mood='legend'] .moon { animation: moon-pulse var(--beat, 0.5s) infinite; }
+@keyframes moon-pulse { 50% { scale: 1.25; box-shadow: 0 0 90px 30px #fff6cf99, inset -10px -6px 0 #eadf9d; } }
+.stage[data-mood='legend'] .band .monster { animation: hop var(--beat, 0.5s) infinite; }
+@keyframes hop { 50% { translate: 0 -9%; } }

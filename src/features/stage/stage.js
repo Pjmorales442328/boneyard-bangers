@@ -1,0 +1,39 @@
+// The graveyard stage: scenery, four band slots and the crowd.
+import { el } from '../../lib/dom.js';
+import { SLOTS } from '../../config/song.js';
+import { monsterById } from '../../config/monsters.js';
+import { createMonsterView } from './monsterView.js';
+import { createCrowd } from './crowd.js';
+
+export function createStage({ onRemove }) {
+  const slots = Array.from({ length: SLOTS }, () => el('div', { class: 'slot' }));
+  const band = el('div', { class: 'band' }, slots);
+  const crowd = createCrowd();
+  const stones = [12, 34, 63, 86].map((x, i) => el('div', { class: 'stone', style: `left:${x}%; --tilt:${[-14, 9, -8, 16][i]}deg; --h:${[1, 0.8, 1.1, 0.9][i]}` }));
+  const stars = Array.from({ length: 24 }, (_, i) => el('i', { class: 'star-dot', style: `left:${(i * 37) % 100}%; top:${(i * 53) % 55}%; --d:${(i % 5) * 0.7}s` }));
+  const node = el('div', { class: 'stage', 'data-mood': 'idle' }, el('div', { class: 'sky' }, stars, el('div', { class: 'moon' })), el('div', { class: 'hill' }), stones, band, crowd.node);
+  const views = {};
+
+  // Monster size follows the stage width so four always fit.
+  new ResizeObserver(([entry]) => node.style.setProperty('--s', (entry.contentRect.width / SLOTS / 430).toFixed(4))).observe(node);
+
+  function setBand(ids) {
+    Object.keys(views).forEach((id) => delete views[id]);
+    slots.forEach((slot, i) => {
+      slot.replaceChildren();
+      const id = ids[i];
+      if (!id) return slot.append(el('div', { class: 'empty-spot' }, '?'));
+      views[id] = createMonsterView(monsterById[id]);
+      views[id].node.addEventListener('click', () => onRemove(id));
+      slot.append(views[id].node);
+    });
+  }
+
+  function setMood(mood, beatSeconds) {
+    node.dataset.mood = mood;
+    node.style.setProperty('--beat', `${beatSeconds}s`);
+    crowd.setMood(mood);
+  }
+
+  return { node, setBand, setMood, hit: (id, note) => views[id]?.hit(note.v) };
+}

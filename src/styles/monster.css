@@ -1,0 +1,30 @@
+/* A monster is built at art size (640x820) and shrunk by --s so every piece keeps its proportions. */
+.monster { width: calc(640px * var(--s, 0.2)); height: calc(820px * var(--s, 0.2)); position: relative; flex: none; }
+.monster .scaler { position: absolute; left: 0; bottom: 0; width: 640px; height: 820px; transform: scale(var(--s, 0.2)); transform-origin: left bottom; }
+.monster img { position: absolute; user-select: none; pointer-events: none; }
+.rig { position: absolute; inset: 0; }
+
+.leg { bottom: 0; }
+.leg.left { right: 50%; margin-right: 10px; }
+.leg.right { left: 50%; margin-left: 10px; transform: scaleX(-1); }
+
+.torso { position: absolute; left: 50%; bottom: calc(var(--leg-h) - 80px); translate: -50% 0; transform-origin: 50% 100%; display: grid; place-items: center; }
+.torso .body { position: relative; display: block; }
+
+.arm { top: 30%; transform-origin: 50% 8%; z-index: -1; }
+.arm.left { right: calc(100% - 85px); }
+.arm.right { left: calc(100% - 85px); transform: scaleX(-1); }
+
+.detail { top: -34px; z-index: -1; }
+.detail.left { left: 8%; }
+.detail.right { right: 8%; transform: scaleX(-1); }
+
+.face { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding-bottom: 8%; }
+.face img { position: static; }
+.eyes { display: flex; gap: 6px; }
+.eyes-2 .eye { width: 96px; }
+.eyes .eye { animation: blink 4.2s infinite; animation-delay: calc(var(--i, 0) * -0.9s); }
+@keyframes blink { 0%, 94%, 100% { scale: 1 1; } 97% { scale: 1 0.1; } }
+
+.instrument { position: absolute; left: 50%; bottom: 0; width: 270px; transform: translateX(-50%); filter: drop-shadow(0 10px 0 #0004); }
+.instrument svg { display: block; width: 100%; }

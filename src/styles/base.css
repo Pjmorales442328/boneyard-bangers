@@ -1,0 +1,25 @@
+/* Page frame and shared tokens. The game is one phone-shaped column, centred on wide screens. */
+:root {
+  --ink: #1a1242;
+  --panel: #2a1e58;
+  --card: #3a2b73;
+  --text: #f6f2ff;
+  --muted: #b9addf;
+  --accent: #ffd84a;
+  --good: #57e39b;
+  font-family: 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: #0f0a2a; color: var(--text); overflow: hidden; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+button { font: inherit; color: inherit; border: 0; cursor: pointer; }
+h1, h2, p { margin: 0; }
+[hidden] { display: none !important; }
+
+#app { height: 100dvh; max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)); }
+
+.start { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; text-align: center; padding: 24px; }
+.start h1 { font-size: clamp(36px, 11vw, 60px); line-height: 1; color: var(--accent); text-shadow: 0 5px 0 #b3472c, 0 12px 26px #0008; rotate: -3deg; }
+.start-status { max-width: 300px; color: var(--muted); font-size: 17px; line-height: 1.4; }
+.start .mash { width: min(100%, 300px); }

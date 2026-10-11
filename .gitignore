@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+credentials.md
+.rundot-docs/
+raw-assets/
+*.log
